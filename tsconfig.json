@@ -6,8 +6,8 @@
         "lib": ["es2015"],
         "esModuleInterop": true,
 
-        "rootDir": "src",
-        "outDir": "lib",
+        "rootDir": "./src",
+        "outDir": "./lib",
 
         "strict": true,
         "alwaysStrict": true,
@@ -30,5 +30,6 @@
 
         "pretty": true
     },
-    "include": ["typings/**/*", "src/**/*"]
+    "include": ["typings/**/*", "src/**/*"],
+    "exclude": ["node_modules", "src/**/*.spec.ts"]
 }
