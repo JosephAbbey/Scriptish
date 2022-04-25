@@ -44,21 +44,21 @@ function isAlphaNumeric(character: string) {
 }
 
 export enum TokenType {
-    COMMA = 100,
-    FullStop = 101,
+    COMMA = 101,
+    FullStop = 102,
 
     // Literals
-    NUMBER = 102,
-    STRING = 103, // can be a variable name or function name
+    NUMBER = 103,
+    STRING = 104, // can be a variable name or function name
 
     // KeyPhrases
-    ADD = 0, // "plus"
-    SUBTRACT = 1, // "minus"
-    MULTIPLY = 2, // "times", "multiplied by"
-    DIVIDE = 3, // "divided by"
+    ADD = 0, // "plus", "+"
+    SUBTRACT = 1, // "minus", "-"
+    MULTIPLY = 2, // "times", "multiplied by", "*"
+    DIVIDE = 3, // "divided by", "/"
 
     // Other
-    EOF = 104,
+    EOF = 100,
 }
 
 const KeyPhrases = [
@@ -176,10 +176,11 @@ export class LexerIterator implements Iterator<Token> {
                 });
             }
 
+            // TODO: Add support for numbers in word form
             if (isAlphaNumeric(this.current)) {
                 var s = this.string();
                 return new Token(
-                    KeyPhrases.findIndex((values) => values.includes(s)) ||
+                    KeyPhrases.findIndex((values) => values.includes(s)) ??
                         TokenType.STRING,
                     s,
                     {
@@ -200,6 +201,26 @@ export class LexerIterator implements Iterator<Token> {
             if (this.current == '\r') {
                 this.advance();
                 continue;
+            }
+
+            if (this.current == '+') {
+                this.advance();
+                return new Token(TokenType.ADD, '+', this.position);
+            }
+
+            if (this.current == '-') {
+                this.advance();
+                return new Token(TokenType.SUBTRACT, '-', this.position);
+            }
+
+            if (this.current == '*') {
+                this.advance();
+                return new Token(TokenType.MULTIPLY, '*', this.position);
+            }
+
+            if (this.current == '/') {
+                this.advance();
+                return new Token(TokenType.DIVIDE, '/', this.position);
             }
 
             if (this.current == '.') {
@@ -230,13 +251,17 @@ export class LexerIterator implements Iterator<Token> {
 }
 
 export default class Lexer implements Iterable<Token> {
-    iterator: LexerIterator;
+    private iterator: LexerIterator;
     constructor(input: string) {
         this.iterator = new LexerIterator(input);
     }
 
     [Symbol.iterator]() {
         return this.iterator;
+    }
+
+    next() {
+        return this.iterator.next();
     }
 
     array() {
